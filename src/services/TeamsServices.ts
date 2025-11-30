@@ -1,4 +1,5 @@
 import { type Team } from "../models/Team";
+import { PokeServices } from "./PokeServices";
 import { randomUUID } from "crypto";
 export class TeamService {
   private static teams: Team[] = []; //Time em memoria sendo um array vazio.
@@ -36,24 +37,19 @@ export class TeamService {
     if (team.pokemons.length >= 6) {
       throw new Error("Team is full"); //Se o time ja tiver 6 pokemons lança erro
     }
-    const response = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${pokemonName}`, //Busca o pokemon na pokeapi
-    );
-    if (!response.ok) {
-      throw new Error("Pokemon not found"); //Se der erro lança que não achou o pokemon
-    }
-    const pokedata = await response.json(); //Pega os dados da resposta
+    const pokedata = await PokeServices.getPokemonByName(pokemonName); //Busca o pokemon na pokeapi
+
     team.pokemons.push({ id: pokedata.id, name: pokedata.name }); //Adiciona o pokemon no array de pokemons propio do time
     return team;
   }
 
   static removePokemon(id: string, pokemonName: string) {
     const team = this.getTeamById(id); //Procura e retorna o time com o id passado
-    pokemonName = pokemonName.trim().toLowerCase(); 
+    pokemonName = pokemonName.trim().toLowerCase();
     if (!team) {
       throw new Error("Team not found"); //Repete um pouco da logica do addPokemon
     }
-    if (!team.pokemons.some(p => p.name === pokemonName)) {
+    if (!team.pokemons.some((p) => p.name === pokemonName)) {
       throw new Error("Pokemon not found in team"); //Verifica antes se o pokemon existe no time, se não existir lança um erro
     }
 

@@ -5,7 +5,7 @@ const teamRouter = Router();
 
 teamRouter.get("/", TeamController.getAllTeams); // GET http://localhost:PORT/teams/ -> teams definido no app.ts
 
-teamRouter.post("/", TeamController.createTeam); // POST http://localhost:PORT/teams/ 
+teamRouter.post("/", TeamController.createTeam); // POST http://localhost:PORT/teams/
 
 teamRouter.get("/:id", TeamController.getTeamById); // GET EX: http://localhost:PORT/teams/1 (1 = id do time)
 

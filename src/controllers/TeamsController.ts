@@ -8,7 +8,8 @@ export class TeamController {
 
   static createTeam(req: Request, res: Response) {
     const { name } = req.body; //Pega o nome do corpo da requisição
-    if (!name || name.trim().length === 0) { //Verifica se o nome foi passado e se não é ""
+    if (!name || name.trim().length === 0) {
+      //Verifica se o nome foi passado e se não é ""
       return res.status(400).json({ message: "Name is required" });
     }
     const newTeam = TeamService.createTeam(name); //Cria o novo time utilizando o service
@@ -17,8 +18,8 @@ export class TeamController {
 
   static getTeamById(req: Request, res: Response) {
     const { id } = req.params;
-    if(!id){
-      return res.status(400).json({message: "Team id is required"}); //Verficia se o id foi passado (no typescript precisa da verificação pois id pode ser string ou undefined)
+    if (!id) {
+      return res.status(400).json({ message: "Team id is required" }); //Verficia se o id foi passado (no typescript precisa da verificação pois id pode ser string ou undefined)
     }
     const team = TeamService.getTeamById(id); //Procura o time pelo id utilizando o service
     if (!team) {
@@ -27,11 +28,12 @@ export class TeamController {
     return res.status(200).json(team);
   }
 
-  static async addPokemon(req: Request, res: Response) { //async pois faz uma requisição a pokeapi
+  static async addPokemon(req: Request, res: Response) {
+    //async pois faz uma requisição a pokeapi
     const { id } = req.params;
     const { pokemonName } = req.body;
-    if(!id){
-      return res.status(400).json({message: "Team id is required"}); //Verficia se o id foi passado (no typescript precisa da verificação pois id pode ser string ou undefined)
+    if (!id) {
+      return res.status(400).json({ message: "Team id is required" }); //Verficia se o id foi passado (no typescript precisa da verificação pois id pode ser string ou undefined)
     }
     if (!pokemonName) {
       return res.status(404).json({ message: "Pokemon name is required" }); //Verifica se o nome do pokemon foi passado (no typescript ocorre o processo de verificação pois pode ser string ou undefined)
@@ -43,14 +45,15 @@ export class TeamController {
       if (error instanceof Error) {
         return res.status(400).json({ message: error.message });
       }
+      return res.status(500).json({ message: "Unexpected error" });
     }
   }
 
   static removePokemon(req: Request, res: Response) {
     const { id } = req.params;
     const { pokemonName } = req.params;
-    if(!id){
-      return res.status(400).json({message: "Team id is required"}); //Verifica id explicado antes
+    if (!id) {
+      return res.status(400).json({ message: "Team id is required" }); //Verifica id explicado antes
     }
     if (!pokemonName) {
       return res.status(404).json({ message: "Pokemon name is required" }); //Verifica nome do pokemon explicado antes
@@ -67,15 +70,15 @@ export class TeamController {
 
   static deleteTeam(req: Request, res: Response) {
     const { id } = req.params;
-    if(!id){
-      return res.status(400).json({message: "Team id is required"}); //Verifica o id explicado antes
+    if (!id) {
+      return res.status(400).json({ message: "Team id is required" }); //Verifica o id explicado antes
     }
-    try{
+    try {
       TeamService.deleteTeam(id); //Tenta deletar o time utilizando o service
       return res.status(200).json("Team deleted!!");
-    }
-    catch(error){
-      if (error instanceof Error) { //instaceof verifica se o error é do tipo error (necessario typescript )
+    } catch (error) {
+      if (error instanceof Error) {
+        //instaceof verifica se o error é do tipo error (necessario typescript )
         return res.status(400).json({ message: error.message });
       }
     }
