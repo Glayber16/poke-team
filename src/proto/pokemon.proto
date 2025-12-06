@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pokemon;
+
+message Pokemon{
+  string name = 1;
+  string url = 2;
+  string sprit = 3;
+}
+
+message PokemonList{
+  repeated Pokemon results = 1;
+}
