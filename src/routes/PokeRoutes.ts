@@ -9,5 +9,4 @@ pokeRouter.get("/type/:name", PokeController.getPokemonsByType);
 
 pokeRouter.get("/:name", PokeController.getPokemonByName);
 
-
 export default pokeRouter;

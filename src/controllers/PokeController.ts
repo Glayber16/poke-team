@@ -4,7 +4,6 @@ import protobuf from "protobufjs";
 import * as js2xmlparser from "js2xmlparser";
 import path from "path";
 
-
 export class PokeController {
   //Controlador para lidar com as reqs direta da api externa, manipular os dados retornando apenas o necessario
   static async getPokemons(req: Request, res: Response) {
@@ -13,26 +12,28 @@ export class PokeController {
       //Formata os dados para que se adeque ao protobuf
       const formattedPokes = {
         results: pokemons.results.map((pokemon: any) => {
-        const urlParts = pokemon.url.split('/');
-        const id = urlParts[urlParts.length - 2];
-        return {
+          const urlParts = pokemon.url.split("/");
+          const id = urlParts[urlParts.length - 2];
+          return {
             name: pokemon.name,
             url: pokemon.url,
-           
-            sprit: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
-          };     
-        })
-      }
+
+            sprit: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+          };
+        }),
+      };
       //Identificar o formato como XML ou Proto (Json é padrão)
       const format = req.query.format as string;
-      if (format === 'xml') {
+      if (format === "xml") {
         const xmlData = js2xmlparser.parse("pokemonList", formattedPokes);
-        res.set('Content-Type', 'application/xml');
-        return res.send(xmlData)
+        res.set("Content-Type", "application/xml");
+        return res.send(xmlData);
       }
-      if(format === 'proto'){
+      if (format === "proto") {
         //Pasta onde ta o pokemon.proto (esquema dos dados)
-        const root = await protobuf.load(path.join(__dirname, '../proto/pokemon.proto'));
+        const root = await protobuf.load(
+          path.join(__dirname, "../proto/pokemon.proto"),
+        );
         //Procura o pokemonList dentro do pacote pokemon
         const PokemonListSchema = root.lookupType("pokemon.PokemonList");
         //Verifica se os dados passados estão de acordo com o pokemon.proto
@@ -43,11 +44,10 @@ export class PokeController {
         const message = PokemonListSchema.create(formattedPokes);
         //Converte pra binario
         const buffer = PokemonListSchema.encode(message).finish();
-        res.set('Content-Type', 'application/x-protobuf');
+        res.set("Content-Type", "application/x-protobuf");
         return res.send(buffer);
       }
       return res.status(200).json(formattedPokes.results);
-      
     } catch (error) {
       if (error instanceof Error) {
         return res.status(400).json({ message: error.message });
@@ -66,14 +66,14 @@ export class PokeController {
       const formattedPoke = {
         id: pokemon.id,
         name: pokemon.name,
-        sprit: pokemon.sprites.front_default, 
+        sprit: pokemon.sprites.front_default,
         types: pokemon.types.map((type: any) => type.type.name),
         stats: pokemon.stats.map((stat: any) => ({
-            name: stat.stat.name,
-            value: stat.base_stat
-        }))
+          name: stat.stat.name,
+          value: stat.base_stat,
+        })),
       };
-      
+
       return res.status(200).json(formattedPoke);
     } catch (error) {
       if (error instanceof Error) {
@@ -89,16 +89,16 @@ export class PokeController {
     }
     try {
       const typedata = await PokeServices.getPokemonsByType(name);
-      const formattedPokes = typedata.pokemon.map((poke: any) => { //Poke é a key do array
-        const urlParts = poke.pokemon.url.split('/');
+      const formattedPokes = typedata.pokemon.map((poke: any) => {
+        //Poke é a key do array
+        const urlParts = poke.pokemon.url.split("/");
         const id = urlParts[urlParts.length - 2];
-        return{
+        return {
           name: poke.pokemon.name,
           url: poke.pokemon.url,
-          sprit: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
-        }
-        
-      })
+          sprit: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+        };
+      });
       return res.status(200).json(formattedPokes); //Formatar esse json para retornar apenas alguns dados essenciais
     } catch (error) {
       if (error instanceof Error) {

@@ -5,6 +5,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": ".",
+    
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module

@@ -1,34 +1,56 @@
 import { type Team } from "../models/Team";
 import { PokeServices } from "./PokeServices";
 import { randomUUID } from "crypto";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient(); //Instanciando a conexão com o banco
 export class TeamService {
-  private static teams: Team[] = []; //Time em memoria sendo um array vazio.
+  
 
-  static getAllTeams() {
-    return this.teams; // Retorna o array de times local
+
+  static async getAllTeams() {
+    return await prisma.team.findMany({
+      include:{
+        pokemons:true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    }); // Retorna o array de times local
   }
 
-  static createTeam(name: string) {
-    const newTeam: Team = { name, id: randomUUID(), pokemons: [] }; //Cria um novo time onde o usuario passa o nome, mas o id é automatico e array de pokemons vazios
-    this.teams.push(newTeam); //Adiciona o novo time no array de times
-    return newTeam;
-  }
-
-  static deleteTeam(id: string) {
-    const size = this.teams.length; //Tamanho inicial do array (pode usar some())
-    this.teams = this.teams.filter((team) => team.id !== id); //Filtra o array removendo o time com o id passado
-    if (this.teams.length === size) {
-      throw new Error("Team not found"); //Se o tamanho do array continuar o mesmo é pq o time não existia/nao foi encontrado
+  static async createTeam(name: string) {
+    const count = await prisma.team.count();
+    if(count >= 50){
+      const oldest = await prisma.team.findFirst({
+        orderBy: {createdAt: 'desc'}
+      }); //Logica pra limpar os times para não exagerar na quantidade
+      if(oldest){
+        await prisma.team.delete({where: {id: oldest.id}})
+      }
     }
-    return;
+
+    return await prisma.team.create({
+      data: {
+        name: name
+      }
+    })
   }
 
-  static getTeamById(id: string) {
-    return this.teams.find((team) => team.id === id); //Procura e retorna o time com o id passado
+
+  static async deleteTeam(id: string) {
+    return await prisma.team.delete({where: {id}})
+  }
+
+  static async getTeamById(id: string) {
+    return await prisma.team.findUnique({
+            where: { id },
+            include: { pokemons: true }
+        }); //Procura e retorna o time com o id passado
   }
 
   static async addPokemon(id: string, pokemonName: string) {
-    const team = this.getTeamById(id); //Reutiliza o getbyid assim pegando o time passado pelo id
+    const team = await this.getTeamById(id); //Reutiliza o getbyid assim pegando o time passado pelo id
     pokemonName = pokemonName.trim().toLowerCase(); //Formata o nome do pokemon
 
     if (!team) {
@@ -39,12 +61,17 @@ export class TeamService {
     }
     const pokedata = await PokeServices.getPokemonByName(pokemonName); //Busca o pokemon na pokeapi
 
-    team.pokemons.push({ id: pokedata.id, name: pokedata.name }); //Adiciona o pokemon no array de pokemons propio do time
-    return team;
+    return await prisma.pokemon.create({
+            data: {
+                name: pokedata.name,
+                pokeId: pokedata.id, // Salvamos o ID oficial (ex: 25)
+                teamId: id     // Vinculamos ao time (Foreign Key)
+            }
+        });
   }
 
-  static removePokemon(id: string, pokemonName: string) {
-    const team = this.getTeamById(id); //Procura e retorna o time com o id passado
+  static async removePokemon(id: string, pokemonName: string) {
+    const team = await this.getTeamById(id); //Procura e retorna o time com o id passado
     pokemonName = pokemonName.trim().toLowerCase();
     if (!team) {
       throw new Error("Team not found"); //Repete um pouco da logica do addPokemon
@@ -53,10 +80,12 @@ export class TeamService {
       throw new Error("Pokemon not found in team"); //Verifica antes se o pokemon existe no time, se não existir lança um erro
     }
 
-    team.pokemons = team.pokemons.filter(
-      (pokemon) => pokemon.name !== pokemonName, //Filtra o array removendo o nome passado
-    );
-    return team;
+    return await prisma.pokemon.deleteMany({
+      where: {
+        teamId: id,
+        name: pokemonName
+      }
+    })
   }
 }
 export default TeamService;
