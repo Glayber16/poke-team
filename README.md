@@ -1,9 +1,9 @@
-# 🚀 Poke Teams API (Backend)
+#  Poke Teams API (Backend)
 
 API REST desenvolvida em Node.js e TypeScript para gerenciamento de times Pokémon. O projeto utiliza uma arquitetura em camadas (MVC) e destaca-se pela implementação de **Content Negotiation**, servindo dados em múltiplos formatos (JSON, XML e Protocol Buffers) para alta performance.
 
-🔗 **Frontend Repository:** [Acesse aqui](https://github.com/Glayber16/front-poke-team)  
-🎥 **Demo de Funcionamento (Explicando para o professor):** [Assistir Vídeo](https://drive.google.com/file/d/1LzhdIVtUhiaV63K-WMMjM2_JJyny9OL9/view)
+ **Frontend Repository:** [Acesse aqui](https://github.com/Glayber16/front-poke-team)  
+ **Demo de Funcionamento (Explicando para o professor):** [Assistir Vídeo](https://drive.google.com/file/d/1LzhdIVtUhiaV63K-WMMjM2_JJyny9OL9/view)
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -28,11 +28,9 @@ API REST desenvolvida em Node.js e TypeScript para gerenciamento de times Pokém
 
 Embora o projeto atenda aos requisitos iniciais, as seguintes melhorias foram identificadas para evoluir a aplicação para um cenário de produção:
 - [ ] **Persistencia de Dados** Adicionar persistencia com PostegreSQL
-- [ ] **Testes:** Adicionar cobertura de testes unitários (Jest) no Backend.
 - [ ] **Infraestrutura:** Criar setup com Docker Compose para facilitar o ambiente de desenvolvimento.
-- [ ] **Performance:** Implementar paginação infinita (Infinite Scroll) na listagem de Pokémons no Frontend.
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```bash
 src/
